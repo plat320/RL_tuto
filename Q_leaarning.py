@@ -5,10 +5,6 @@ import matplotlib.pyplot as plt
 env = gym.make("MountainCar-v0")
 env.reset()
 
-# print(env.observation_space.high)
-# print(env.observation_space.low)
-# print(env.action_space.n)
-
 LR = 0.1
 DISCOUNT = 0.95
 EPISODES = 5000
@@ -27,7 +23,6 @@ END_EPSILON_DECAYING = EPISODES // 2
 epsilon_decay_value = epsilon / (END_EPSILON_DECAYING - START_EPSILON_DECAYING)
 
 q_table = np.random.uniform(low=-2, high=0, size=(DISCRETE_OS_SIZE + [env.action_space.n]))     #### this case 20 x 20 x 3
-print(q_table)
 
 ep_rewards = []
 aggr_ep_rewards = {'ep':[], 'avg': [], 'min': [], 'max': []}        #### episode number
@@ -79,7 +74,7 @@ for episode in range(EPISODES):
     ep_rewards.append(episode_reward)
 
     if not episode % STATS_EVERY:
-        average_reward = sum(ep_rewards[-STATS_EVERY:])/STATS_EVERY
+        average_reward = sum(ep_rewards[-STATS_EVERY:])/len(ep_rewards[-STATS_EVERY:])
         aggr_ep_rewards['ep'].append(episode)
         aggr_ep_rewards['avg'].append(average_reward)
         aggr_ep_rewards['max'].append(max(ep_rewards[-STATS_EVERY:]))
