@@ -27,7 +27,7 @@ q_table = np.random.uniform(low=-2, high=0, size=(DISCRETE_OS_SIZE + [env.action
 ep_rewards = []
 aggr_ep_rewards = {'ep':[], 'avg': [], 'min': [], 'max': []}        #### episode number
 
-def get_discreet_state(state):
+def get_discrete_state(state):
     discrete_state = (state - env.observation_space.low) / discrete_os_win_size
     return tuple(discrete_state.astype(int))
 
@@ -41,7 +41,7 @@ for episode in range(EPISODES):
     else:
         render = False
 
-    discrete_state = get_discreet_state(env.reset())
+    discrete_state = get_discrete_state(env.reset())
     done = False
 
     while not done:
@@ -54,7 +54,7 @@ for episode in range(EPISODES):
 
         episode_reward += reward
 
-        new_discrete_state = get_discreet_state(new_state)
+        new_discrete_state = get_discrete_state(new_state)
         # print(reward, new_state)
         if render:
             env.render()

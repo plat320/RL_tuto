@@ -21,7 +21,7 @@ class CriticNetwork(nn.Module):
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
         self.q = nn.Linear(self.fc2_dims, 1)
 
-        self.optimizer = optim.Adam(self.parametrs(), lr=beta)
+        self.optimizer = optim.Adam(self.parameters(), lr=beta)
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
         self.to(self.device)
@@ -36,11 +36,11 @@ class CriticNetwork(nn.Module):
 
         return q
 
-    def save_checkponint(self):
+    def save_checkpoint(self):
         torch.save(self.state_dict(), self.checkpoint_file)
 
     def load_checkpoint(self):
-        torch.loac_state_dict(torch.load(self.checkpoint_file))
+        torch.nn.Module.load_state_dict(self, torch.load(self.checkpoint_file))
 
 class ValueNetwork(nn.Module):
     def __init__(self, beta, input_dims, fc1_dims=256, fc2_dims=256, name='value', chkpt_dir='tmp/sac'):
@@ -64,10 +64,12 @@ class ValueNetwork(nn.Module):
     def forward(self, state):
         state_value = self.fc1(state)
         state_value = F.relu(state_value)
-        state_value = self.fc2(state)
+        state_value = self.fc2(state_value)
         state_value = F.relu(state_value)
 
         v = self.v(state_value)
+
+        return v
 
     def save_checkpoint(self):
         torch.save(self.state_dict(), self.checkpoint_file)
@@ -127,3 +129,11 @@ class ActorNetwork(nn.Module):
         log_probs = log_probs.sum(1, keepdim=True)
 
         return action, log_probs
+
+
+    def save_checkpoint(self):
+        torch.save(self.state_dict(), self.checkpoint_file)
+
+
+    def load_checkpoint(self):
+        self.load_state_dict(torch.load(self.checkpoint_file))

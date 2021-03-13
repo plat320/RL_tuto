@@ -52,8 +52,8 @@ class Agent():
         self.actor.save_checkpoint()
         self.value.save_checkpoint()
         self.target_value.save_checkpoint()
-        self.critic_1.save_checkponint()
-        self.critic_2.save_checkponint()
+        self.critic_1.save_checkpoint()
+        self.critic_2.save_checkpoint()
 
     def load_models(self):
         print('.... loading models ....')
@@ -87,7 +87,7 @@ class Agent():
         critic_value = torch.min(q1_new_policy, q2_new_policy)
         critic_value = critic_value.view(-1)
 
-        self.value_optimizer.zero_grad()
+        self.value.optimizer.zero_grad()
         value_target = critic_value - log_probs
         value_loss = 0.5 * F.mse_loss(value, value_target)
         value_loss.backward(retain_graph=True)
@@ -114,7 +114,7 @@ class Agent():
         critic_1_loss = 0.5 * F.mse_loss(q1_old_policy, q_hat)
         critic_2_loss = 0.5 * F.mse_loss(q2_old_policy, q_hat)
 
-        critic_loss = critic_1_loss = critic_2_loss
+        critic_loss = critic_1_loss + critic_2_loss
         critic_loss.backward()
         self.critic_1.optimizer.step()
         self.critic_2.optimizer.step()
