@@ -62,7 +62,7 @@ def calc_row_col_rewards(col, row, action, MOVING_COST, RENTAL_CREDIT, VTABLE,
 if __name__ == '__main__':
     DISCOUNT_FACTOR = 0.9
     ITER = 5
-    CONVERGE = 100
+    CONVERGE = 10
     MOVING_COST = -2
     RENTAL_CREDIT = 10
     #### table init
@@ -79,42 +79,14 @@ if __name__ == '__main__':
 
     POI_PROB3 = np.array([[poisson_prob(y, 3) for y in range(11)]])
     first_POI_PROB = np.matmul(POI_PROB3.T, POI_PROB3)
-    # POI_PROB4 = np.array([poisson_prob(y, 4) for y in range(11)])
-    # POI_PROB2 = np.array([poisson_prob(y, 2) for y in range(11)])
-    # POI_PROB3 = np.array([poisson_prob(y, 3) for y in range(11)])
-    #
-    # POI_PROB = np.stack((POI_PROB2, POI_PROB3, POI_PROB4))
 
     #### Start iteration
-    for iter in range(ITER):
-        POLICY_UPDATE_FLAG = False
-        while True:
-            stime = time.time()
-            print("\nITER = {}".format(iter + 1))
-            print("update VALUE TABLE")
-            for col in range(21):
-                for row in range(21):
-                    #### greedy action
-                    action = ACTION_TABLE[col, row]
-                    action_reward, total_credit_reward, total_discount_reward = calc_row_col_rewards(col, row, action, MOVING_COST, RENTAL_CREDIT, VTABLE,
-                                                                                                     first_POI_PROB=first_POI_PROB, second_POI_PROB=second_POI_PROB)
-                    VTABLE_[col, row] = action_reward + total_credit_reward + DISCOUNT_FACTOR*total_discount_reward
-
-            #### update value table
-            print("update value time: {:.4f}".format(time.time()-stime))
-            if np.sum(np.abs(VTABLE - VTABLE_)) < CONVERGE:
-                POLICY_UPDATE_FLAG = True
-            VTABLE = copy.deepcopy(VTABLE_)
-            print(VTABLE.astype(int))
-
-            if POLICY_UPDATE_FLAG:
-                break
-
-
-
+    POLICY_UPDATE_FLAG = False
+    iter = 0
+    while True:
         stime = time.time()
-        #### update action table
-        print("update POLICY TABLE")
+        print("\nITER = {}".format(iter + 1))
+        print("update VALUE TABLE")
         for col in range(21):
             for row in range(21):
                 action_quality_value = np.zeros((11))
@@ -129,9 +101,43 @@ if __name__ == '__main__':
                                                                                                      first_POI_PROB=first_POI_PROB, second_POI_PROB=second_POI_PROB)
                     action_quality_value[idx] = action_reward + total_credit_reward + total_discount_reward * DISCOUNT_FACTOR
 
-                ACTION_TABLE_[col, row] = ACTION[np.argmax(action_quality_value)]
-        ACTION_TABLE = copy.deepcopy(ACTION_TABLE_)
-        ACTION_TABLE_ = np.zeros((21,21))
-        print(ACTION_TABLE.astype(int))
-        print("update policy time: {:.4f}".format(time.time()-stime))
+
+                VTABLE_[col, row] = np.max(action_quality_value)
+
+        #### update value table
+        print("update value time: {:.4f}".format(time.time()-stime))
+        if np.sum(np.abs(VTABLE - VTABLE_)) < CONVERGE:
+            POLICY_UPDATE_FLAG = True
+        VTABLE = copy.deepcopy(VTABLE_)
+        print(VTABLE.astype(int))
+
+        if POLICY_UPDATE_FLAG:
+            break
+
+        iter+=1
+
+
+
+    stime = time.time()
+    #### update action table
+    print("update POLICY TABLE")
+    for col in range(21):
+        for row in range(21):
+            action_quality_value = np.zeros((11))
+            for idx, action in enumerate(ACTION):
+                #### action exception
+                if col - action < 0 or col - action > 20:
+                    continue
+                if row + action < 0 or row + action > 20:
+                    continue
+
+                action_reward, total_credit_reward, total_discount_reward = calc_row_col_rewards(col, row, action, MOVING_COST, RENTAL_CREDIT, VTABLE,
+                                                                                                 first_POI_PROB=first_POI_PROB, second_POI_PROB=second_POI_PROB)
+                action_quality_value[idx] = action_reward + total_credit_reward + total_discount_reward * DISCOUNT_FACTOR
+
+            ACTION_TABLE_[col, row] = ACTION[np.argmax(action_quality_value)]
+    ACTION_TABLE = copy.deepcopy(ACTION_TABLE_)
+    ACTION_TABLE_ = np.zeros((21,21))
+    print(ACTION_TABLE.astype(int))
+    print("update policy time: {:.4f}".format(time.time()-stime))
 

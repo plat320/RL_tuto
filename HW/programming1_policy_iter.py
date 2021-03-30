@@ -79,11 +79,6 @@ if __name__ == '__main__':
 
     POI_PROB3 = np.array([[poisson_prob(y, 3) for y in range(11)]])
     first_POI_PROB = np.matmul(POI_PROB3.T, POI_PROB3)
-    # POI_PROB4 = np.array([poisson_prob(y, 4) for y in range(11)])
-    # POI_PROB2 = np.array([poisson_prob(y, 2) for y in range(11)])
-    # POI_PROB3 = np.array([poisson_prob(y, 3) for y in range(11)])
-    #
-    # POI_PROB = np.stack((POI_PROB2, POI_PROB3, POI_PROB4))
 
     #### Start iteration
     for iter in range(ITER):
