@@ -83,6 +83,8 @@ if __name__ == '__main__':
     #### Start iteration
     POLICY_UPDATE_FLAG = False
     iter = 0
+    total_stime = time.time()
+
     while True:
         stime = time.time()
         print("\nITER = {}".format(iter + 1))
@@ -140,4 +142,4 @@ if __name__ == '__main__':
     ACTION_TABLE_ = np.zeros((21,21))
     print(ACTION_TABLE.astype(int))
     print("update policy time: {:.4f}".format(time.time()-stime))
-
+    print("total time: {:.4f}".format(time.time()-total_stime))

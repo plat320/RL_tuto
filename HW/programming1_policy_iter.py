@@ -81,6 +81,7 @@ if __name__ == '__main__':
     first_POI_PROB = np.matmul(POI_PROB3.T, POI_PROB3)
 
     #### Start iteration
+    total_stime = time.time()
     for iter in range(ITER):
         POLICY_UPDATE_FLAG = False
         while True:
@@ -129,4 +130,4 @@ if __name__ == '__main__':
         ACTION_TABLE_ = np.zeros((21,21))
         print(ACTION_TABLE.astype(int))
         print("update policy time: {:.4f}".format(time.time()-stime))
-
+    print("Total time: {:.4f}".format(time.time()-total_stime))
