@@ -1,9 +1,10 @@
 #### programming 1
 import numpy as np
-from itertools import product
 import math
 import copy
 import time
+
+import matplotlib.pyplot as plt
 
 
 def poisson_prob(n, lamda):
@@ -55,6 +56,39 @@ def calc_row_col_rewards(col, row, action, MOVING_COST, RENTAL_CREDIT, VTABLE,
 
     return action_reward, total_credit_reward, total_discount_reward
 
+
+def plot_table(VTABLE, ACTION_TABLE, iter):
+    # First subplot
+    fig = plt.figure(figsize=plt.figaspect(2.))
+    fig.suptitle('Jacks car rental')
+    ax3d = fig.add_subplot(2, 1, 1, projection="3d")
+
+    x = np.linspace(0, 20, 21)
+    y = np.linspace(0, 20, 21)
+    X, Y = np.meshgrid(x, y)
+    Z = VTABLE
+    ax3d.plot_surface(X, Y, Z, cmap='plasma')
+    ax3d.set_title('StateValueFunction')
+    ax3d.set_xlabel('X')
+    ax3d.set_ylabel('Y')
+    ax3d.set_zlabel('Z')
+    ax3d.grid(True)
+
+    # Second subplot
+    ax3d = fig.add_subplot(2, 1, 2, projection='3d')
+
+    x = np.linspace(0, 20, 21)
+    y = np.linspace(0, 20, 21)
+    X, Y = np.meshgrid(x, y)
+    Z = ACTION_TABLE
+
+    ax3d.plot_surface(X, Y, Z, cmap='summer')
+    ax3d.set_title('Policy')
+    ax3d.set_xlabel('X')
+    ax3d.set_ylabel('Y')
+    ax3d.set_zlabel('Z')
+    ax3d.grid(True)
+    plt.savefig("savefig{}".format(iter + 1))
 
 
 
@@ -130,4 +164,8 @@ if __name__ == '__main__':
         ACTION_TABLE_ = np.zeros((21,21))
         print(ACTION_TABLE.astype(int))
         print("update policy time: {:.4f}".format(time.time()-stime))
+
+        plot_table(VTABLE, ACTION_TABLE, "policy_iter{}".format(iter+1))
+
+
     print("Total time: {:.4f}".format(time.time()-total_stime))
