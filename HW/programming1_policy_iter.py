@@ -87,21 +87,28 @@ if __name__ == '__main__':
 
     #### Start iteration
     for iter in range(ITER):
-        stime = time.time()
-        print("\nITER = {}".format(iter + 1))
-        print("update VALUE TABLE")
-        for col in range(21):
-            for row in range(21):
-                #### greedy action
-                action = ACTION_TABLE[col, row]
-                action_reward, total_credit_reward, total_discount_reward = calc_row_col_rewards(col, row, action, MOVING_COST, RENTAL_CREDIT, VTABLE,
-                                                                                                 first_POI_PROB=first_POI_PROB, second_POI_PROB=second_POI_PROB)
-                VTABLE_[col, row] = action_reward + total_credit_reward + DISCOUNT_FACTOR*total_discount_reward
+        POLICY_UPDATE_FLAG = False
+        while True:
+            stime = time.time()
+            print("\nITER = {}".format(iter + 1))
+            print("update VALUE TABLE")
+            for col in range(21):
+                for row in range(21):
+                    #### greedy action
+                    action = ACTION_TABLE[col, row]
+                    action_reward, total_credit_reward, total_discount_reward = calc_row_col_rewards(col, row, action, MOVING_COST, RENTAL_CREDIT, VTABLE,
+                                                                                                     first_POI_PROB=first_POI_PROB, second_POI_PROB=second_POI_PROB)
+                    VTABLE_[col, row] = action_reward + total_credit_reward + DISCOUNT_FACTOR*total_discount_reward
 
-        #### update value table
-        print("update value time: {:.4f}".format(time.time()-stime))
-        VTABLE = copy.deepcopy(VTABLE_)
-        print(VTABLE.astype(int))
+            #### update value table
+            print("update value time: {:.4f}".format(time.time()-stime))
+            if np.sum(np.abs(VTABLE - VTABLE_)) < CONVERGE:
+                POLICY_UPDATE_FLAG = True
+            VTABLE = copy.deepcopy(VTABLE_)
+            print(VTABLE.astype(int))
+
+            if POLICY_UPDATE_FLAG:
+                break
 
 
 
