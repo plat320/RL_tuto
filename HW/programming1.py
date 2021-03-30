@@ -11,14 +11,14 @@ def poisson_prob(n, lamda):
 
 def calc_value(req1, ret1, req2, ret2, mid_col, mid_row, RENTAL_CREDIT, VTABLE,
                POI_PROB=None, first_POI_PROB=None, second_POI_PROB=None):
-    # prob = POI_PROB[1, req1] * POI_PROB[2, req2] * POI_PROB[1,ret1] * POI_PROB[0, ret2]
+
     prob = first_POI_PROB[req1, ret1] * second_POI_PROB[req2, ret2]
 
     req1 = min(mid_col, req1)
     req2 = min(mid_row, req2)
 
-    col_ = np.clip(mid_col + ret1 - req1, 0, 20)
-    row_ = np.clip(mid_row + ret2 - req2, 0, 20)
+    col_ = max(min(mid_col + ret1 - req1, 20), 0)
+    row_ = max(min(mid_row + ret2 - req2, 20), 0)
 
     reward = RENTAL_CREDIT*(req1+req2)
 
@@ -43,6 +43,7 @@ def calc_row_col_rewards(col, row, action, MOVING_COST, RENTAL_CREDIT, VTABLE,
     assert mid_row >= 0, "row value less than 0"
 
     #### Poisson process
+
     for req1 in range(11):
         for ret1 in range(11):
             for req2 in range(11):
@@ -60,7 +61,8 @@ def calc_row_col_rewards(col, row, action, MOVING_COST, RENTAL_CREDIT, VTABLE,
 
 if __name__ == '__main__':
     DISCOUNT_FACTOR = 0.9
-    ITER = 4
+    ITER = 5
+    CONVERGE = 100
     MOVING_COST = -2
     RENTAL_CREDIT = 10
     #### table init
@@ -97,9 +99,12 @@ if __name__ == '__main__':
                 VTABLE_[col, row] = action_reward + total_credit_reward + DISCOUNT_FACTOR*total_discount_reward
 
         #### update value table
-        VTABLE = copy.deepcopy(VTABLE_)
-        print(VTABLE)
         print("update value time: {:.4f}".format(time.time()-stime))
+        VTABLE = copy.deepcopy(VTABLE_)
+        print(VTABLE.astype(int))
+
+
+
         stime = time.time()
         #### update action table
         print("update POLICY TABLE")
@@ -119,8 +124,7 @@ if __name__ == '__main__':
 
                 ACTION_TABLE_[col, row] = ACTION[np.argmax(action_quality_value)]
         ACTION_TABLE = copy.deepcopy(ACTION_TABLE_)
+        ACTION_TABLE_ = np.zeros((21,21))
         print(ACTION_TABLE.astype(int))
         print("update policy time: {:.4f}".format(time.time()-stime))
 
-    print(VTABLE)
-    print(ACTION_TABLE)
