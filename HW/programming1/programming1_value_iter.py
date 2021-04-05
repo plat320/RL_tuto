@@ -89,14 +89,14 @@ def plot_table(VTABLE, ACTION_TABLE, iter):
     ax3d.set_ylabel('Y')
     ax3d.set_zlabel('Z')
     ax3d.grid(True)
-    plt.savefig("savefig{}".format(iter + 1))
+    plt.savefig("savefig{}".format(iter))
 
 
 
 if __name__ == '__main__':
     DISCOUNT_FACTOR = 0.9
     ITER = 5
-    CONVERGE = 10
+    CONVERGE = 20
     MOVING_COST = -2
     RENTAL_CREDIT = 10
     #### table init

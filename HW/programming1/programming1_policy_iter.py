@@ -88,7 +88,7 @@ def plot_table(VTABLE, ACTION_TABLE, iter):
     ax3d.set_ylabel('Y')
     ax3d.set_zlabel('Z')
     ax3d.grid(True)
-    plt.savefig("savefig{}".format(iter + 1))
+    plt.savefig("savefig{}".format(iter))
 
 
 
@@ -164,6 +164,8 @@ if __name__ == '__main__':
         ACTION_TABLE_ = np.zeros((21,21))
         print(ACTION_TABLE.astype(int))
         print("update policy time: {:.4f}".format(time.time()-stime))
+        CONVERGE -= 20
+        print("Threshold of converge: {}".format(CONVERGE))
 
         plot_table(VTABLE, ACTION_TABLE, "policy_iter{}".format(iter+1))
 
