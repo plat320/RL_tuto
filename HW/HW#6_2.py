@@ -39,6 +39,7 @@ class Cliff_Walking():
 
     def Q_learning_update(self):
         time_step = 0
+        end_flag = 0
         state = copy.deepcopy(self.init_state)
         total_reward = 0
         while True:
@@ -56,9 +57,10 @@ class Cliff_Walking():
             state_[0] = min(max(state_[0], 0), 11)
             state_[1] = min(max(state_[1], 0), 3)
 
-            if (0< state_[0] < 11) and state_[1] == 0:
+            if (0 < state_[0] < 11) and state_[1] == 0:
                 reward = -100
                 state_ = self.init_state
+                end_flag = 1
 
             action_ = self.choose_action(state_, False)
 
@@ -70,7 +72,7 @@ class Cliff_Walking():
             state = copy.deepcopy(state_)
 
             total_reward += reward
-            if state_[0] == 11 and state_[1] == 0:
+            if (state_[0] == 11 and state_[1] == 0) or end_flag == 1:
                 print(total_reward)
                 return total_reward
 
@@ -88,6 +90,7 @@ class Cliff_Walking():
 
     def SARSA_update(self):
         time_step = 0
+        end_flag = 0
         state = copy.deepcopy(self.init_state)
         total_reward = 0
         while True:
@@ -108,6 +111,7 @@ class Cliff_Walking():
             if (0< state_[0] < 11) and state_[1] == 0:
                 reward = -100
                 state_ = self.init_state
+                end_flag = 1
 
             action_ = self.choose_action(state_)
 
@@ -119,7 +123,7 @@ class Cliff_Walking():
             state = copy.deepcopy(state_)
 
             total_reward += reward
-            if state_[0] == 11 and state_[1] == 0:
+            if (state_[0] == 11 and state_[1] == 0) or end_flag == 1:
                 print(total_reward)
                 return total_reward
 
@@ -144,7 +148,7 @@ if __name__ == '__main__':
     PLAY.SARSA()
     PLAY.Q_learning()
     plt.legend(["SARSA", "Q learning"])
-    plt.axis([0, 500, -100, 0])
+    # plt.axis([0, 500, -100, 0])
     plt.savefig("./Cliff_Walking_axis.png")
 
 
