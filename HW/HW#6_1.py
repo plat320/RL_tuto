@@ -1,4 +1,4 @@
-#### HW#5
+#### HW#6 windy grid SARSA and SARSA_lambda
 import numpy as np
 import random
 import copy
