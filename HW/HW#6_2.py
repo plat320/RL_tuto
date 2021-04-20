@@ -25,19 +25,31 @@ class Cliff_Walking():
         self.Q_TABLE_ = np.zeros((12, 4, 4))
         self.E_TABLE = np.zeros((12, 4, 4))
 
-    def Q_learning(self):
+    def Q_learning(self, repeat=1):
         self.ALL_INIT()
         print("Start Q learning")
+        plot_reward = [0]*500
+        for i in range(repeat):
+            self.ALL_INIT()
+            if i % 5 == 4:
+                print(i)
+            for episode in range(500):
+                reward = self.Q_learning_update()
+                plot_reward[episode] += reward
+        plot_reward = np.array(plot_reward) / 100
+        if repeat != 1:
+            plt.plot(np.array(plot_reward))
+
+    def test_Q_learning(self):
+        print("Test Q learning")
         plot_reward = []
         for episode in range(500):
-            reward = self.Q_learning_update()
-
+            reward = self.Q_learning_update(greedy = False, update = False)
             plot_reward += [reward]
         plt.plot(np.array(plot_reward))
 
 
-
-    def Q_learning_update(self):
+    def Q_learning_update(self, greedy = True, update = True):
         time_step = 0
         end_flag = 0
         state = copy.deepcopy(self.init_state)
@@ -48,7 +60,7 @@ class Cliff_Walking():
             reward = -1
             time_step += 1
             state_ = copy.deepcopy(state)
-            action = self.choose_action(state, False)
+            action = self.choose_action(state, greedy)
 
             #### by action
             state_ += self.ACTION[action]
@@ -62,33 +74,45 @@ class Cliff_Walking():
                 state_ = self.init_state
                 end_flag = 1
 
-            action_ = self.choose_action(state_, False)
-
             #### Q table update
-            self.Q_TABLE_ = copy.deepcopy(self.Q_TABLE)
-            self.Q_TABLE_[state[0], state[1], action] += self.ALPHA * (reward + self.DISCOUNT_FACTOR * self.Q_TABLE[state_[0], state_[1], action_] - self.Q_TABLE[state[0], state[1], action])
+            if update:
+                self.Q_TABLE_ = copy.deepcopy(self.Q_TABLE)
+                self.Q_TABLE_[state[0], state[1], action] += self.ALPHA * (reward + self.DISCOUNT_FACTOR * max(self.Q_TABLE[state_[0], state_[1]]) - self.Q_TABLE[state[0], state[1], action])
 
-            self.Q_TABLE = copy.deepcopy(self.Q_TABLE_)
+                self.Q_TABLE = copy.deepcopy(self.Q_TABLE_)
             state = copy.deepcopy(state_)
 
             total_reward += reward
             if (state_[0] == 11 and state_[1] == 0) or end_flag == 1:
-                print(total_reward)
+                # print(total_reward)
                 return total_reward
 
-    def SARSA(self):
+    def SARSA(self, repeat=1):
         self.ALL_INIT()
         print("Start SARSA")
+        plot_reward = [0]*500
+        for i in range(repeat):
+            self.ALL_INIT()
+            if i % 5 == 4:
+                print(i)
+            for episode in range(500):
+                reward = self.SARSA_update()
+                plot_reward[episode] += reward
+        plot_reward = np.array(plot_reward) / 100
+        if repeat != 1:
+            plt.plot(np.array(plot_reward))
+
+
+    def test_SARSA(self):
+        print("Test SARSA")
         plot_reward = []
         for episode in range(500):
-            reward = self.SARSA_update()
-
+            reward = self.SARSA_update(greedy = False, update = False)
             plot_reward += [reward]
         plt.plot(np.array(plot_reward))
 
 
-
-    def SARSA_update(self):
+    def SARSA_update(self, greedy = True, update = True):
         time_step = 0
         end_flag = 0
         state = copy.deepcopy(self.init_state)
@@ -99,7 +123,7 @@ class Cliff_Walking():
             reward = -1
             time_step+=1
             state_ = copy.deepcopy(state)
-            action = self.choose_action(state)
+            action = self.choose_action(state, greedy)
 
             #### by action
             state_ += self.ACTION[action]
@@ -116,20 +140,21 @@ class Cliff_Walking():
             action_ = self.choose_action(state_)
 
             #### Q table update
-            self.Q_TABLE_ = copy.deepcopy(self.Q_TABLE)
-            self.Q_TABLE_[state[0], state[1], action] += self.ALPHA * (reward + self.DISCOUNT_FACTOR * self.Q_TABLE[state_[0], state_[1], action_] - self.Q_TABLE[state[0], state[1], action])
+            if update:
+                self.Q_TABLE_ = copy.deepcopy(self.Q_TABLE)
+                self.Q_TABLE_[state[0], state[1], action] += self.ALPHA * (reward + self.DISCOUNT_FACTOR * self.Q_TABLE[state_[0], state_[1], action_] - self.Q_TABLE[state[0], state[1], action])
 
-            self.Q_TABLE = copy.deepcopy(self.Q_TABLE_)
+                self.Q_TABLE = copy.deepcopy(self.Q_TABLE_)
             state = copy.deepcopy(state_)
 
             total_reward += reward
             if (state_[0] == 11 and state_[1] == 0) or end_flag == 1:
-                print(total_reward)
+                # print(total_reward)
                 return total_reward
 
 
-    def choose_action(self, state, SARSA=True):
-        if (random.random() < self.EPS) and SARSA:
+    def choose_action(self, state, greedy=True):
+        if (random.random() < self.EPS) and greedy:
             #### exploration
             return random.randint(0,3)          #### randomly choose 0~3 action
 
@@ -146,9 +171,11 @@ class Cliff_Walking():
 if __name__ == '__main__':
     PLAY = Cliff_Walking()
     PLAY.SARSA()
+    PLAY.test_SARSA()
     PLAY.Q_learning()
+    PLAY.test_Q_learning()
     plt.legend(["SARSA", "Q learning"])
-    # plt.axis([0, 500, -100, 0])
+    plt.axis([0, 500, -100, 0])
     plt.savefig("./Cliff_Walking_axis.png")
 
 
